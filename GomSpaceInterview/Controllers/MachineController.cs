@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using GomSpaceInterview.Simulator;
 
 namespace GomSpaceInterview.Controllers
 {
@@ -22,41 +23,37 @@ namespace GomSpaceInterview.Controllers
         ///  <b>
         ///  'b'   represents black square
         ///  'w'   represents white square
-        ///  '^'    represents upwards
-        ///  '-'   represents downwards
+        ///  '↑'    represents upwards
+        ///  '↓'   represents downwards
         ///  '→'   represents right side
         ///  '←'   represents left side
         ///  '0'    untouch squares
-        ///  'x'   represents the borders
+        ///  'X'   represents the borders
         ///   </b>
         ///    
         /// </remarks>
-        /// <param name="interations"> insert a range between 1 and 1000</param>
+        /// <param name="input">range between 1 and 1000</param>
         ///  <type></type>
         /// <returns>This Method will output a txt file with the representation of the process .</returns>
         /// <response code="200">Return txt file</response>
-        [HttpPut("{interations:int}")]
+        /// <response code="400">input was below or aborve the requirements</response>
+        [HttpPut("{input:int}")]
         [ProducesResponseType(200)]
-        public ActionResult Put(int interations)
+        [ProducesResponseType(400)]
+        public ActionResult Put(int input)
         {
+            if (input <= 0 || input > 1000)
+                return BadRequest();
 
             using (var memStream = new MemoryStream())
             using (var streamWriter = new StreamWriter(memStream))
             {
-                for (int i = 0; i < 6; i++)
-                    streamWriter.WriteLine("TEST");
-
+                var result = MachineSimulator.Simulate(input);
+                streamWriter.Write(result);
                 streamWriter.Flush();
+
                 return File(memStream.ToArray(), "application/octet-stream", "machine.txt");
             }
-
-            //return "value";
         }
-
-
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }
